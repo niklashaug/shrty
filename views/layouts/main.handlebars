@@ -38,10 +38,13 @@
     <title>🔗 shrty</title>
 </head>
 <body>
-	<nav class="navbar navbar-dark bg-dark navbar-container">
-		<a class="navbar-brand font-weight-bold" href="#">
+	<nav class="navbar navbar-dark bg-dark navbar-container d-flex flex-row align-items-center">
+		<p class="navbar-brand font-weight-bold float-left d-flex flex-row align-items-baseline m-0 p-0">
 			<i class="fas fa-link mr-2"></i>shrty
-		</a>
+		</p>
+		<p class="float-right m-0 font-weight-bold">
+			<i class="fas fa-user-alt mr-2"></i>{{username}}
+		</p>
 	</nav>
 	<div class="container">
 		{{{body}}}
