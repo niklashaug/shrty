@@ -182,6 +182,7 @@ app.post('/login', async (req, res) => {
 app.get('/', AuthenticationPolicy, (req, res) => {
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
     res.render('index', {
+        protocol: config.protocol,
         username: req.user.username,
         csrfToken: req.session.csrf
     })
@@ -198,6 +199,7 @@ app.post('/', AuthenticationPolicy, async (req, res) => {
         req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
 
         res.render('index', {
+            protocol: config.protocol,
             username: req.user.username,
             csrfToken: req.session.csrf,
             link: `${config.host}/${url.slug}`

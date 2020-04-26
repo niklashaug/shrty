@@ -7,6 +7,7 @@ module.exports = {
     jwt: {
         secret: process.env.JWT_SECRET
     },
+    protocol: process.env.NODE_ENV === 'production' ? 'https' : 'http',
     host: process.env.HOST || 'shrty.eu',
     db: {
         name: process.env.DB_NAME,
