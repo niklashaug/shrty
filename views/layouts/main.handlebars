@@ -42,9 +42,11 @@
 		<p class="navbar-brand font-weight-bold float-left d-flex flex-row align-items-baseline m-0 p-0">
 			<i class="fas fa-link mr-2"></i>shrty
 		</p>
+		{{#if username}}
 		<p class="float-right m-0 font-weight-bold">
 			<i class="fas fa-user-alt mr-2"></i>{{username}}
 		</p>
+		{{/if}}
 	</nav>
 	<div class="container">
 		{{{body}}}
