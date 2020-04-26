@@ -3,16 +3,48 @@
 <head>
     <meta charset="utf-8">
 	<link rel="stylesheet" href="/css/bootstrap.min.css">
+	<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;700;900&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">
+	<script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
+	<link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-dark@3/dark.css" rel="stylesheet">
+	<style>
+		body {
+			font-family: Montserrat;
+		}
+
+		.swal2-popup.swal2-toast {
+			box-shadow: none;
+		}
+
+		.input-container {
+			height: calc(100vh - 70px);
+		}
+
+		.navbar-container {
+			height: 70px;
+		}
+
+		input.borderless-input {
+			font-size: 5rem;
+			background: transparent;
+			border: none;
+			color: #FFF !important;
+		}
+
+		input.borderless-input:focus {
+			outline: none;
+		}
+	</style>
     <title>shrty</title>
 </head>
 <body>
-	<nav class="navbar navbar-dark bg-dark">
-		<a class="navbar-brand" href="#">
-			<img src="/docs/4.4/assets/brand/bootstrap-solid.svg" width="30" height="30" class="d-inline-block align-top" alt="">
+	<nav class="navbar navbar-dark bg-dark navbar-container">
+		<a class="navbar-brand font-weight-bold" href="#">
 			<i class="fas fa-link mr-2"></i>shrty.eu
 		</a>
 	</nav>
-    {{{body}}}
+	<div class="container">
+		{{{body}}}
+	</div>
 </body>
 </html>

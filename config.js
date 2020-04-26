@@ -1,5 +1,6 @@
 require('dotenv').config()
 module.exports = {
+    host: process.env.HOST || 'shrty.eu',
     db: {
         name: process.env.DB_NAME,
         host: process.env.DB_HOST || 'localhost',
