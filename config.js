@@ -1,5 +1,12 @@
 require('dotenv').config()
 module.exports = {
+    csrf: {
+        sessionSecret: process.env.SESSION_SECRET,
+        tokenLength: process.env.TOKEN_LENGTH || 32
+    },
+    jwt: {
+        secret: process.env.JWT_SECRET
+    },
     host: process.env.HOST || 'shrty.eu',
     db: {
         name: process.env.DB_NAME,

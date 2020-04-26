@@ -1,5 +1,6 @@
-<form method="POST" id="form" class="input-container d-flex justify-content-center align-items-center">
-	<input name="url" class="input-group-text borderless-input w-100 font-weight-lighter" type="text" placeholder="Type an URL and hit enter..." autofocus>
+<form method="POST" class="input-container d-flex justify-content-center align-items-center">
+	<input name="csrf" type="hidden" value="{{csrfToken}}">
+	<input name="url" class="input-group-text borderless-input w-100 font-weight-lighter" type="url" placeholder="Type an URL and hit enter..." autofocus>
 </form>
 
 {{#if link}}

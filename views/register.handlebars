@@ -1,0 +1,26 @@
+<form method="POST" class="input-container d-flex flex-column justify-content-center align-items-center">
+	<div>
+		<input name="csrf" type="hidden" value="{{csrfToken}}">
+		<input name="username" class="input-group-text" type="text" placeholder="Username" autofocus>
+		<input name="password" class="input-group-text mt-2" type="password" placeholder="Password">
+		<button type="submit" class="btn btn-primary mt-2 w-100">Register</button>
+	</div>
+</form>
+{{#if error}}
+	<script>
+		Swal.fire({
+			title: 'Error',
+			text: '{{error}}',
+			icon: 'error',
+			toast: true,
+			position: 'top-end',
+			showConfirmButton: false,
+			timer: 10000,
+			timerProgressBar: true,
+			onOpen: (toast) => {
+				toast.addEventListener('mouseenter', Swal.stopTimer)
+				toast.addEventListener('mouseleave', Swal.resumeTimer)
+			}
+		})
+	</script>
+{{/if}}
