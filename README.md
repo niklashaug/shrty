@@ -1,2 +1,2 @@
 # shrty
-
+basic url shortener
