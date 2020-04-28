@@ -110,6 +110,9 @@ async function AuthenticationPolicy (req, res, next) {
 
 // ROUTES
 app.get('/register', (req, res) => {
+    if(req.session && req.session.user) {
+        return res.redirect('/')
+    }
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
     console.log(req.session.csrf)
     res.render('register', {
@@ -143,6 +146,9 @@ app.post('/register', async (req, res) => {
 })
 
 app.get('/login', (req, res) => {
+    if(req.session && req.session.user) {
+        return res.redirect('/')
+    }
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
     res.render('login', {
         csrfToken: req.session.csrf
@@ -160,10 +166,15 @@ app.post('/login', async (req, res) => {
         if(user && user.activated) {
             if(await bcrypt.compare(req.body.password, user.password)) {
                 //success
-                const token = jwt.sign({
+                const userData = {
                     ID: user.ID,
                     username: user.username
-                }, config.jwt.secret)
+                }
+
+                const token = jwt.sign(userData, config.jwt.secret)
+
+                req.session.user = userData
+
                 res.cookie('Authentication', token, {
                     httpOnly: true,
                     secure: process.env.NODE_ENV === 'production'
