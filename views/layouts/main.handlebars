@@ -25,7 +25,7 @@
 		}
 
 		input.borderless-input {
-			font-size: 5rem;
+			font-size: 3.5rem;
 			background: transparent;
 			border: none;
 			color: #FFF !important;
@@ -34,10 +34,17 @@
 		input.borderless-input:focus {
 			outline: none;
 		}
+
+		.unselectable {
+			-webkit-user-select: none;
+			-moz-user-select: none;
+			-ms-user-select: none;
+			user-select: none;
+		}
 	</style>
     <title>🔗 shrty</title>
 </head>
-<body>
+<body class="unselectable">
 	<nav class="navbar navbar-dark bg-dark navbar-container d-flex flex-row align-items-center">
 		<p class="navbar-brand font-weight-bold float-left d-flex flex-row align-items-baseline m-0 p-0">
 			<i class="fas fa-link mr-2"></i>shrty
