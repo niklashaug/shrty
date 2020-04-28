@@ -220,18 +220,20 @@ app.get('/', AuthenticationPolicy, (req, res) => {
 })
 
 app.post('/', csrfPolicy, AuthenticationPolicy, async (req, res) => {
+    if(req.body.url) {
+        const url = await URL.create({
+            slug: cryptoRandomString({ length: 6 }),
+            userID: req.session.user.ID,
+            forward: shurley.parse(req.body.url)
+        })
 
-    const url = await URL.create({
-        slug: cryptoRandomString({ length: 6 }),
-        userID: req.session.user.ID,
-        forward: shurley.parse(req.body.url)
-    })
+        req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
 
-    req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+        req.session.link = `${config.host}/${url.slug}`
 
-    req.session.link = `${config.host}/${url.slug}`
+    }
+
     res.redirect('/')
-
 })
 
 app.get('/my-urls', AuthenticationPolicy, async (req, res) => {
