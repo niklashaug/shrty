@@ -4,9 +4,6 @@ module.exports = {
         sessionSecret: process.env.SESSION_SECRET,
         tokenLength: process.env.TOKEN_LENGTH || 32
     },
-    jwt: {
-        secret: process.env.JWT_SECRET
-    },
     protocol: process.env.NODE_ENV === 'production' ? 'https' : 'http',
     host: process.env.HOST || 'shrty.eu',
     db: {

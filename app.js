@@ -5,7 +5,6 @@ const exHbs = require('express-handlebars')
 const cryptoRandomString = require('crypto-random-string')
 const path = require('path')
 const shurley = require('shurley')
-const jwt = require('jsonwebtoken')
 const session = require('express-session')
 const bcrypt = require('bcrypt')
 
@@ -93,14 +92,10 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production'
 }))
 
-// JWT MIDDLEWARE
+// AUTHENTICATION MIDDLEWARE
 async function AuthenticationPolicy (req, res, next) {
-    let token = req.cookies.Authentication
-    let verify = token ? jwt.verify(token, config.jwt.secret) : null
-
-    if(verify) {
+    if(req.session && req.session.user && req.session.user.ID) {
         //success
-        req.user = verify
         next()
     } else {
         //authentication failed
@@ -113,8 +108,9 @@ app.get('/register', (req, res) => {
     if(req.session && req.session.user) {
         return res.redirect('/')
     }
+
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
-    console.log(req.session.csrf)
+
     res.render('register', {
         csrfToken: req.session.csrf
     })
@@ -135,8 +131,10 @@ app.post('/register', async (req, res) => {
             }
         } catch(err) {
             if(err.name === 'SequelizeUniqueConstraintError') {
+                req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
                 res.render('register', {
-                    error: 'This username has already been taken.'
+                    error: 'This username has already been taken.',
+                    csrfToken: req.session.csrf
                 })
             }
         }
@@ -171,14 +169,8 @@ app.post('/login', async (req, res) => {
                     username: user.username
                 }
 
-                const token = jwt.sign(userData, config.jwt.secret)
-
                 req.session.user = userData
 
-                res.cookie('Authentication', token, {
-                    httpOnly: true,
-                    secure: process.env.NODE_ENV === 'production'
-                })
                 return res.redirect('/')
             }
         }
@@ -190,11 +182,16 @@ app.post('/login', async (req, res) => {
     }
 })
 
+app.post('/logout', (req, res) => {
+    req.session.destroy()
+    res.redirect('/login')
+})
+
 app.get('/', AuthenticationPolicy, (req, res) => {
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
     res.render('index', {
         protocol: config.protocol,
-        username: req.user.username,
+        username: req.session.user.username,
         csrfToken: req.session.csrf
     })
 })
@@ -203,7 +200,7 @@ app.post('/', AuthenticationPolicy, async (req, res) => {
     if(req.body.csrf === req.session.csrf) {
         const url = await URL.create({
             slug: cryptoRandomString({ length: 6 }),
-            userID: req.user.ID,
+            userID: req.session.user.ID,
             forward: shurley.parse(req.body.url)
         })
 
@@ -211,7 +208,7 @@ app.post('/', AuthenticationPolicy, async (req, res) => {
 
         res.render('index', {
             protocol: config.protocol,
-            username: req.user.username,
+            username: req.session.user.username,
             csrfToken: req.session.csrf,
             link: `${config.host}/${url.slug}`
         })

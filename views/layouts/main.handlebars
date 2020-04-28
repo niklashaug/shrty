@@ -43,9 +43,16 @@
 			<i class="fas fa-link mr-2"></i>shrty
 		</p>
 		{{#if username}}
-		<p class="float-right m-0 font-weight-bold">
-			<i class="fas fa-user-alt mr-2"></i>{{username}}
-		</p>
+			<div class="float-right d-flex flex-row align-items-center">
+				<p class="mr-3 m-0 font-weight-bold">
+					<i class="fas fa-user-alt mr-2"></i>{{username}}
+				</p>
+				<form action="/logout" method="POST">
+					<input name="csrf" type="hidden" value="{{csrfToken}}">
+					<button class="btn btn-secondary" type="submit"><i class="fas fa-sign-out-alt mr-2"></i>Logout</button>
+				</form>
+			</div>
+
 		{{/if}}
 	</nav>
 	<div class="container">
