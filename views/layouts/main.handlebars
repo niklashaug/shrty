@@ -60,9 +60,11 @@
 						<button class="btn btn-info" type="submit"><i class="fas fa-arrow-left mr-2"></i>back</button>
 					</a>
 				{{else}}
+					{{#if user.urls.length }}
 					<a href="/my-urls">
 						<button class="btn btn-info" type="submit"><i class="fas fa-history mr-2"></i>history<span class="ml-2 badge badge-primary">{{user.urls.length}}</span></button>
 					</a>
+					{{/if}}
 				{{/if}}
 				</div>
 				<form action="/logout" method="POST">
