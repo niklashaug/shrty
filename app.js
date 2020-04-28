@@ -120,6 +120,15 @@ async function AuthenticationPolicy (req, res, next) {
     }
 }
 
+// CSRF MIDDLEWARE
+function csrfPolicy(req, res, next) {
+    if(req.body.csrf === req.session.csrf) {
+        next()
+    } else {
+        res.status(401).send()
+    }
+}
+
 // ROUTES
 app.get('/register', (req, res) => {
     if(req.session && req.session.user) {
@@ -133,30 +142,26 @@ app.get('/register', (req, res) => {
     })
 })
 
-app.post('/register', async (req, res) => {
-    if(req.body.csrf === req.session.csrf) {
-        const hash = await bcrypt.hash(req.body.password, 10)
+app.post('/register', csrfPolicy, async (req, res) => {
+    const hash = await bcrypt.hash(req.body.password, 10)
 
-        try {
-            const user = await User.create({
-                user: req.body.user,
-                password: hash
-            })
+    try {
+        const user = await User.create({
+            user: req.body.user,
+            password: hash
+        })
 
-            if(user) {
-                res.status(200).redirect('/login')
-            }
-        } catch(err) {
-            if(err.name === 'SequelizeUniqueConstraintError') {
-                req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
-                res.render('register', {
-                    error: 'This username has already been taken.',
-                    csrfToken: req.session.csrf
-                })
-            }
+        if(user) {
+            res.status(200).redirect('/login')
         }
-    } else {
-        res.status(401).send()
+    } catch(err) {
+        if(err.name === 'SequelizeUniqueConstraintError') {
+            req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+            res.render('register', {
+                error: 'This username has already been taken.',
+                csrfToken: req.session.csrf
+            })
+        }
     }
 })
 
@@ -170,36 +175,33 @@ app.get('/login', (req, res) => {
     })
 })
 
-app.post('/login', async (req, res) => {
-    if(req.body.csrf === req.session.csrf) {
-        const user = await User.findOne({
-            where: {
-                username: req.body.username
-            },
-            include: [URL]
-        })
+app.post('/login', csrfPolicy, async (req, res) => {
+    const user = await User.findOne({
+        where: {
+            username: req.body.username
+        },
+        include: [URL]
+    })
 
-        if(user && user.activated) {
-            if(await bcrypt.compare(req.body.password, user.password)) {
-                //success
-                req.session.user = {
-                    ID: user.ID,
-                    username: user.username,
-                    urls: user.urls
-                }
-
-                return res.redirect('/')
+    if(user && user.activated) {
+        if(await bcrypt.compare(req.body.password, user.password)) {
+            //success
+            req.session.user = {
+                ID: user.ID,
+                username: user.username,
+                urls: user.urls
             }
-        }
 
-        //wrong credentials
-        res.status(200).redirect('/login')
-    } else {
-        res.status(401).send()
+            return res.redirect('/')
+        }
     }
+
+    //wrong credentials
+    res.status(200).redirect('/login')
+
 })
 
-app.post('/logout', (req, res) => {
+app.post('/logout', csrfPolicy, AuthenticationPolicy, (req, res) => {
     req.session.destroy()
     res.redirect('/login')
 })
@@ -217,21 +219,19 @@ app.get('/', AuthenticationPolicy, (req, res) => {
     }
 })
 
-app.post('/', AuthenticationPolicy, async (req, res) => {
-    if(req.body.csrf === req.session.csrf) {
-        const url = await URL.create({
-            slug: cryptoRandomString({ length: 6 }),
-            userID: req.session.user.ID,
-            forward: shurley.parse(req.body.url)
-        })
+app.post('/', csrfPolicy, AuthenticationPolicy, async (req, res) => {
 
-        req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+    const url = await URL.create({
+        slug: cryptoRandomString({ length: 6 }),
+        userID: req.session.user.ID,
+        forward: shurley.parse(req.body.url)
+    })
 
-        req.session.link = `${config.host}/${url.slug}`
-        res.redirect('/')
-    } else {
-        res.redirect('/')
-    }
+    req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+
+    req.session.link = `${config.host}/${url.slug}`
+    res.redirect('/')
+
 })
 
 app.get('/my-urls', AuthenticationPolicy, async (req, res) => {
