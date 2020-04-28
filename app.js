@@ -242,22 +242,12 @@ app.get('/my-urls', AuthenticationPolicy, async (req, res) => {
     res.render('list', {
         host: config.host,
         user: req.session.user,
-        csrfToken: req.session.csrf,
         listView: true,
         helpers: {
-            host: () => config.host
+            host: () => config.host,
+            csrfToken: () => req.session.csrf
         }
     })
-})
-
-app.post('/:slug', AuthenticationPolicy, async (req, res) => {
-    const url = await URL.findByPk(req.params.slug, { include: [User] })
-    if(url.toJSON().user.ID === req.session.user.ID) {
-        url.destroy()
-        res.redirect('/my-urls')
-    } else {
-        res.status(401).send()
-    }
 })
 
 app.get('/:slug', async (req, res) => {
@@ -271,6 +261,16 @@ app.get('/:slug', async (req, res) => {
         res.status(200).redirect(url.forward)
     } else {
         res.status(404).send()
+    }
+})
+
+app.post('/:slug', csrfPolicy, AuthenticationPolicy, async (req, res) => {
+    const url = await URL.findByPk(req.params.slug, { include: [User] })
+    if(url.toJSON().user.ID === req.session.user.ID) {
+        url.destroy()
+        res.redirect('/my-urls')
+    } else {
+        res.status(401).send()
     }
 })
 
