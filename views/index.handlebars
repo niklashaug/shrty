@@ -1,31 +1,30 @@
+{{#if link}}
+<script>
+	const copy = str => {
+		const el = document.createElement('textarea');
+		el.value = str;
+		document.body.appendChild(el);
+		el.select();
+		document.execCommand('copy');
+		document.body.removeChild(el);
+	}
+
+	copy('{{link}}')
+
+	Swal.fire({
+		title: 'Success!',
+		html: 'You can access your shortlink via your clipboard.<div class="d-flex flex-row align-items-center justify-content-center"><a href="{{protocol}}://{{link}}" class="font-weight-bold" target="_blank">{{link}}</a><button class="btn btn-sm btn-secondary ml-2" onclick="copy(\'{{link}}\')"><i class="fas fa-copy"></i></button></div>',
+		icon: 'success',
+		timer: 10000,
+		timerProgressBar: true,
+		onOpen: (toast) => {
+			toast.addEventListener('mouseenter', Swal.stopTimer)
+			toast.addEventListener('mouseleave', Swal.resumeTimer)
+		}
+	})
+</script>
+{{/if}}
 <form method="POST" class="input-container d-flex justify-content-center align-items-center">
 	<input name="csrf" type="hidden" value="{{csrfToken}}">
 	<input name="url" class="input-group-text borderless-input w-100 font-weight-lighter" type="url" placeholder="Type an URL and hit enter..." autofocus>
 </form>
-
-{{#if link}}
-	<script>
-		const copy = str => {
-			const el = document.createElement('textarea');
-			el.value = str;
-			document.body.appendChild(el);
-			el.select();
-			document.execCommand('copy');
-			document.body.removeChild(el);
-		}
-
-		copy('{{link}}')
-
-		Swal.fire({
-			title: 'Success!',
-			html: 'You can access your shortlink via your clipboard.<div class="d-flex flex-row align-items-center justify-content-center"><a href="{{protocol}}://{{link}}" class="font-weight-bold" target="_blank">{{link}}</a><button class="btn btn-sm btn-secondary ml-2" onclick="copy(\'{{link}}\')"><i class="fas fa-copy"></i></button></div>',
-			icon: 'success',
-			timer: 10000,
-			timerProgressBar: true,
-			onOpen: (toast) => {
-				toast.addEventListener('mouseenter', Swal.stopTimer)
-				toast.addEventListener('mouseleave', Swal.resumeTimer)
-			}
-		})
-	</script>
-{{/if}}

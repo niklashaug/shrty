@@ -1,0 +1,60 @@
+<script>
+	const copy = str => {
+		const el = document.createElement('textarea');
+		el.value = str;
+		document.body.appendChild(el);
+		el.select();
+		document.execCommand('copy');
+		document.body.removeChild(el);
+	}
+
+	function deleteURL(id) {
+		Swal.fire({
+			title: 'Are you sure?',
+			text: "You won't be able to revert this!",
+			icon: 'warning',
+			showCancelButton: true,
+			confirmButtonColor: '#3085d6',
+			cancelButtonColor: '#d33',
+			confirmButtonText: 'Yes, delete it!'
+		}).then(result => {
+			if (result.value) {
+			    //submit form
+			    document.getElementById(id).submit()
+			}
+		})
+	}
+</script>
+<table class="table table-striped table-dark mt-5">
+	<thead>
+	<tr>
+		<th scope="col">url</th>
+		<th scope="col">destination</th>
+		<th scope="col">actions</th>
+	</tr>
+	</thead>
+	<tbody>
+	{{#each user.urls}}
+	<tr>
+		<th scope="row">
+			<a href="{{host}}/{{slug}}" target="_blank">{{host}}/{{slug}}</a>
+			<button class="btn btn-sm btn-secondary ml-1" onclick="copy('{{slug}}')">
+				<i class="fas fa-copy"></i>
+			</button>
+		</th>
+		<td>
+			<a href="{{forward}}" target="_blank">{{forward}}</a>
+			<button class="btn btn-sm btn-secondary ml-1" onclick="copy('{{forward}}')">
+				<i class="fas fa-copy"></i>
+			</button>
+		</td>
+		<td>
+			<form id="{{slug}}" action="/{{slug}}" method="POST">
+				<input name="csrf" type="hidden" value="{{csrfToken}}">
+			</form>
+			<button class="btn btn-danger btn-sm" onclick="deleteURL('{{slug}}')"><i class="fas fa-trash mr-2"></i>delete</button>
+		</td>
+	</tr>
+	{{/each}}
+	</tbody>
+</table>

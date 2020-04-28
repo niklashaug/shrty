@@ -1,7 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cookieParser = require('cookie-parser')
-const exHbs = require('express-handlebars')
+const handlebars = require('express-handlebars')
 const cryptoRandomString = require('crypto-random-string')
 const path = require('path')
 const shurley = require('shurley')
@@ -73,7 +73,7 @@ sequelize.sync()
 
 // HANDLEBARS
 const app = express()
-const hbs = exHbs.create()
+const hbs = handlebars.create()
 
 app.engine('handlebars', hbs.engine)
 app.set('view engine', 'handlebars')
@@ -96,7 +96,24 @@ app.use(session({
 async function AuthenticationPolicy (req, res, next) {
     if(req.session && req.session.user && req.session.user.ID) {
         //success
-        next()
+        User.findByPk(req.session.user.ID, {
+            include: [URL],
+            order: [
+            [URL,
+            'createdAt',
+            'DESC']
+            ]
+        }).then(user => {
+            let userData = user.toJSON()
+
+            req.session.user = {
+                ID: userData.ID,
+                username: userData.username,
+                urls: userData.urls
+            }
+
+            next()
+        })
     } else {
         //authentication failed
         res.redirect('/login')
@@ -122,7 +139,7 @@ app.post('/register', async (req, res) => {
 
         try {
             const user = await User.create({
-                username: req.body.username,
+                user: req.body.user,
                 password: hash
             })
 
@@ -158,18 +175,18 @@ app.post('/login', async (req, res) => {
         const user = await User.findOne({
             where: {
                 username: req.body.username
-            }
+            },
+            include: [URL]
         })
 
         if(user && user.activated) {
             if(await bcrypt.compare(req.body.password, user.password)) {
                 //success
-                const userData = {
+                req.session.user = {
                     ID: user.ID,
-                    username: user.username
+                    username: user.username,
+                    urls: user.urls
                 }
-
-                req.session.user = userData
 
                 return res.redirect('/')
             }
@@ -191,9 +208,13 @@ app.get('/', AuthenticationPolicy, (req, res) => {
     req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
     res.render('index', {
         protocol: config.protocol,
-        username: req.session.user.username,
-        csrfToken: req.session.csrf
+        user: req.session.user,
+        csrfToken: req.session.csrf,
+        link: req.session.link ? req.session.link : null
     })
+    if(req.session.link) {
+        req.session.link = undefined
+    }
 })
 
 app.post('/', AuthenticationPolicy, async (req, res) => {
@@ -206,14 +227,34 @@ app.post('/', AuthenticationPolicy, async (req, res) => {
 
         req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
 
-        res.render('index', {
-            protocol: config.protocol,
-            username: req.session.user.username,
-            csrfToken: req.session.csrf,
-            link: `${config.host}/${url.slug}`
-        })
+        req.session.link = `${config.host}/${url.slug}`
+        res.redirect('/')
     } else {
         res.redirect('/')
+    }
+})
+
+app.get('/my-urls', AuthenticationPolicy, async (req, res) => {
+    req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+
+    res.render('list', {
+        host: config.host,
+        user: req.session.user,
+        csrfToken: req.session.csrf,
+        listView: true,
+        helpers: {
+            host: () => config.host
+        }
+    })
+})
+
+app.post('/:slug', AuthenticationPolicy, async (req, res) => {
+    const url = await URL.findByPk(req.params.slug, { include: [User] })
+    if(url.toJSON().user.ID === req.session.user.ID) {
+        url.destroy()
+        res.redirect('/my-urls')
+    } else {
+        res.status(401).send()
     }
 })
 
