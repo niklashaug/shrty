@@ -214,7 +214,7 @@ app.get('/login', (req, res) => {
         csrfToken: req.session.csrf
     })
 })
-// <h1>myfancyusername</h1><script>window.alert('boese')</script> -> myfancypassword
+
 app.post('/login', csrfPolicy, validate([
     body('username').escape()
 ]), async (req, res) => {
@@ -226,7 +226,6 @@ app.post('/login', csrfPolicy, validate([
     })
 
     if(user && user.activated) {
-        console.log("FOUND USER")
         if(await bcrypt.compare(req.body.password, user.password)) {
             //success
             req.session.user = {
