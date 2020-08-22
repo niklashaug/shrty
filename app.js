@@ -111,8 +111,10 @@ const validate = validations => {
             return next();
         }
 
-        res.status(422).json({
-            errors: errors.array()
+        req.session.csrf = cryptoRandomString({ length: config.csrf.tokenLength })
+        res.status(422).render('register', {
+            csrfToken: req.session.csrf,
+            error: errors.array()[0].message
         })
     };
 }
@@ -169,7 +171,7 @@ app.get('/register', (req, res) => {
 
 app.post('/register', csrfPolicy, validate([
     body('username').isLength({ min: 5 }).withMessage("Username must have at least 5 characters.").escape(),
-    body('password').isLength({ min: 8}).withMessage("Password must have at least 8 characters.")
+    body('password').isLength({ min: 8 }).withMessage("Password must have at least 8 characters.")
 ]), async (req, res) => {
     const hash = await bcrypt.hash(req.body.password, 10)
 
