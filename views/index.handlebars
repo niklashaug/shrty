@@ -8,12 +8,10 @@
 		document.execCommand('copy');
 		document.body.removeChild(el);
 	}
-
-	copy('{{link}}')
-	console.log("test")
-	console.log(\'{{link}}\')
-	copy("test")
-	copy(\'{{link}}\')
+	
+	const link = {{link}}
+	copy(link)
+	console.log("test", link)
 
 	Swal.fire({
 		title: 'Success!',
