@@ -8,14 +8,10 @@
 		document.execCommand('copy');
 		document.body.removeChild(el);
 	}
-	
-	const link = {{link}}
-	copy(link)
-	console.log("test", link)
 
 	Swal.fire({
 		title: 'Success!',
-		html: 'Your shortlink has been copied to your clipboard.<div class="d-flex flex-row align-items-center justify-content-center"><a href="{{protocol}}://{{link}}" class="font-weight-bold" target="_blank">{{link}}</a><button class="btn btn-sm btn-secondary ml-2" onclick="copy(\'{{link}}\')"><i class="fas fa-copy"></i></button></div>',
+		html: 'Your shortlink has been generated.<div class="d-flex flex-row align-items-center justify-content-center"><a href="{{protocol}}://{{link}}" class="font-weight-bold" target="_blank">{{link}}</a><button class="btn btn-sm btn-secondary ml-2" onclick="copy(\'{{link}}\')"><i class="fas fa-copy"></i></button></div>',
 		icon: 'success',
 		timer: 10000,
 		timerProgressBar: true,
