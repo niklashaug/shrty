@@ -34,11 +34,6 @@ const User = sequelize.define('user', {
     password: {
         type: Sequelize.STRING,
         allowNull: false
-    },
-    activated: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false,
-        allowNull: true
     }
 })
 
@@ -225,7 +220,7 @@ app.post('/login', csrfPolicy, validate([
         }
     })
 
-    if(user && user.activated) {
+    if(user) {
         if(await bcrypt.compare(req.body.password, user.password)) {
             //success
             req.session.user = {
