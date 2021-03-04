@@ -1,4 +1,4 @@
 # shrty
 basic url shortener
 
-[shrty.eu](https://shrty.eu)
+[shrty.xyz](https://shrty.xyz)

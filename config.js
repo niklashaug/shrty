@@ -5,7 +5,7 @@ module.exports = {
         tokenLength: process.env.TOKEN_LENGTH || 32
     },
     protocol: process.env.NODE_ENV === 'production' ? 'https' : 'http',
-    host: process.env.HOST || 'shrty.eu',
+    host: process.env.HOST || 'shrty.xyz',
     db: {
         name: process.env.DB_NAME,
         host: process.env.DB_HOST || 'localhost',
